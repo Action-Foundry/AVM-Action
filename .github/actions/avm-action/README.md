@@ -28,6 +28,9 @@ This action provides a clean, opinionated interface for Terraform workflows (`in
 | `azure_client_id` | Azure Client ID (optional; prefer OIDC) | No | `""` |
 | `var_overrides` | JSON or key=value pairs for variable overrides | No | `""` |
 | `log_level` | Logging level (DEBUG, INFO, WARNING, ERROR) | No | `INFO` |
+| `avm_version` | Azure Verified Modules version (e.g., "0.1.0" or "latest") | No | `latest` |
+| `terraform_version` | Terraform version (e.g., "1.6.0" or "latest") | No | `latest` |
+| `azurerm_version` | Azure RM provider version (e.g., "3.85.0" or "latest") | No | `latest` |
 
 ## Outputs
 

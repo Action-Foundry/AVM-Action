@@ -74,7 +74,9 @@ class TerraformRunner:
         # TODO: Support Terraform installation or download
         raise RuntimeError(
             "Terraform binary not found in PATH. "
-            "Please ensure Terraform is installed."
+            "Please ensure Terraform is installed. "
+            "Use 'hashicorp/setup-terraform' action in your workflow, "
+            "or install Terraform locally: https://developer.hashicorp.com/terraform/install"
         )
 
     def build_init_command(self) -> list[str]:

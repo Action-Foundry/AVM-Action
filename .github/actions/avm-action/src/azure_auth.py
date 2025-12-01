@@ -108,6 +108,7 @@ class AzureAuthenticator:
         # 3. Return credentials with token
         raise NotImplementedError(
             "OIDC authentication is not yet implemented. "
+            "As a workaround, use the 'azure/login' action before calling avm-action. "
             "See docs/architecture.md for planned implementation."
         )
 
@@ -177,7 +178,9 @@ class AzureAuthenticator:
         elif method == AuthMethod.MANAGED_IDENTITY:
             # TODO: Implement managed identity authentication
             raise NotImplementedError(
-                "Managed Identity authentication not yet implemented."
+                "Managed Identity authentication not yet implemented. "
+                "As a workaround, use the 'azure/login' action with managed identity, "
+                "or use CLI authentication by running 'az login' first."
             )
         else:
             return self.authenticate_cli()

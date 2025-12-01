@@ -5,13 +5,7 @@ Currently contains placeholder tests for future implementation.
 """
 
 import os
-import sys
 from unittest import mock
-
-# Add the action src to path
-sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "../../.github/actions/avm-action")
-)
 
 from src.main import main
 

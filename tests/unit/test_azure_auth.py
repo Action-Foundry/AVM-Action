@@ -1,15 +1,9 @@
 """Unit tests for azure_auth module."""
 
 import os
-import sys
 from unittest import mock
 
 import pytest
-
-# Add the action src to path
-sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "../../.github/actions/avm-action")
-)
 
 from src.azure_auth import (
     AuthMethod,

@@ -1,16 +1,9 @@
 """Unit tests for config module."""
 
 import os
-
-# Add the action src to path
-import sys
 from unittest import mock
 
 import pytest
-
-sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "../../.github/actions/avm-action")
-)
 
 from src.config import (
     ActionConfig,

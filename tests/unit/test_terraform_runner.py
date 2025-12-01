@@ -1,14 +1,6 @@
 """Unit tests for terraform_runner module."""
 
-import os
-import sys
-
 import pytest
-
-# Add the action src to path
-sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "../../.github/actions/avm-action")
-)
 
 from src.config import ActionConfig, TerraformCommand
 from src.terraform_runner import CommandResult, TerraformRunner

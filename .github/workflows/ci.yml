@@ -95,14 +95,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.0
-
       - name: Test Action (Dry Run)
         uses: ./.github/actions/avm-action
         with:
           tf_directory: ./terraform/examples/basic-usage
           command: validate
           log_level: DEBUG
+
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t avm-action:test .github/actions/avm-action/
+
+      - name: Test Docker image
+        run: |
+          docker run --rm avm-action:test --help || true
+          docker run --rm --entrypoint terraform avm-action:test version

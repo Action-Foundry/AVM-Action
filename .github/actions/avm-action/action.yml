@@ -63,42 +63,9 @@ inputs:
 outputs:
   plan_output:
     description: 'Output from terraform plan command'
-    value: ${{ steps.run-action.outputs.plan_output }}
   state_summary:
     description: 'Summary of the Terraform state changes'
-    value: ${{ steps.run-action.outputs.state_summary }}
 
 runs:
-  using: 'composite'
-  steps:
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install dependencies
-      shell: bash
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r ${{ github.action_path }}/requirements.txt
-
-    - name: Run AVM Action
-      id: run-action
-      shell: bash
-      env:
-        INPUT_TF_DIRECTORY: ${{ inputs.tf_directory }}
-        INPUT_TFVARS_FILES: ${{ inputs.tfvars_files }}
-        INPUT_BACKEND_CONFIG_FILE: ${{ inputs.backend_config_file }}
-        INPUT_COMMAND: ${{ inputs.command }}
-        INPUT_WORKSPACE: ${{ inputs.workspace }}
-        INPUT_AZURE_SUBSCRIPTION_ID: ${{ inputs.azure_subscription_id }}
-        INPUT_AZURE_TENANT_ID: ${{ inputs.azure_tenant_id }}
-        INPUT_AZURE_CLIENT_ID: ${{ inputs.azure_client_id }}
-        INPUT_VAR_OVERRIDES: ${{ inputs.var_overrides }}
-        INPUT_LOG_LEVEL: ${{ inputs.log_level }}
-        INPUT_AVM_VERSION: ${{ inputs.avm_version }}
-        INPUT_TERRAFORM_VERSION: ${{ inputs.terraform_version }}
-        INPUT_AZURERM_VERSION: ${{ inputs.azurerm_version }}
-      run: |
-        cd ${{ github.action_path }}
-        python -m src.main
+  using: 'docker'
+  image: 'Dockerfile'

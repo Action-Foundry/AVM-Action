@@ -8,6 +8,7 @@ This action provides a clean, opinionated interface for Terraform workflows (`in
 
 ## Features
 
+- **Docker-based**: Self-contained environment with Terraform and Python pre-installed
 - **Terraform Command Execution**: Run `init`, `validate`, `plan`, `apply`, and `destroy` commands
 - **tfvars Support**: Accept multiple tfvars files via comma-separated list
 - **Workspace Management**: Automatic workspace selection/creation
@@ -56,11 +57,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.0
-
       - name: Run Terraform Plan
         uses: Action-Foundry/AVM-Action/.github/actions/avm-action@main
         with:
@@ -68,6 +64,8 @@ jobs:
           command: plan
           tfvars_files: terraform.tfvars
 ```
+
+> **Note**: The action includes Terraform in the Docker container, so you don't need to use `hashicorp/setup-terraform` separately.
 
 ### With Azure Authentication (OIDC)
 
@@ -87,9 +85,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
       - name: Azure Login (OIDC)
         uses: azure/login@v2
@@ -133,6 +128,32 @@ Or using key=value format:
     var_overrides: |
       environment=staging
       instance_count=3
+```
+
+## Docker Container
+
+The action uses a Docker container based on `python:3.11-slim` with:
+
+- Python 3.11
+- Terraform 1.6.0 (configurable via build arg)
+- Required system tools (wget, unzip, curl, git)
+
+### Building Locally
+
+```bash
+docker build -t avm-action:local .github/actions/avm-action/
+```
+
+### Testing Locally with Docker
+
+```bash
+docker run --rm \
+  -e INPUT_TF_DIRECTORY="." \
+  -e INPUT_COMMAND="validate" \
+  -e INPUT_LOG_LEVEL="DEBUG" \
+  -v $(pwd)/terraform/examples/basic-usage:/github/workspace \
+  -w /github/workspace \
+  avm-action:local
 ```
 
 ## Current Limitations

@@ -21,7 +21,11 @@ Thank you for your interest in contributing to `avm-action`! This document provi
    black --check .github/actions/avm-action/src/ tests/
    ruff check .github/actions/avm-action/src/ tests/
    ```
-6. **Submit a pull request**
+6. **Test the Docker build**:
+   ```bash
+   docker build -t avm-action:local .github/actions/avm-action/
+   ```
+7. **Submit a pull request**
 
 ## Development Guidelines
 
@@ -31,6 +35,7 @@ Thank you for your interest in contributing to `avm-action`! This document provi
 - **Type Hints**: Required for all function signatures
 - **Docstrings**: Use Google-style docstrings
 - **Terraform**: Use `terraform fmt`
+- **Docker**: Follow Dockerfile best practices
 
 ### Testing
 
@@ -38,6 +43,24 @@ Thank you for your interest in contributing to `avm-action`! This document provi
 - Maintain or improve code coverage
 - Place unit tests in `tests/unit/`
 - Place integration tests in `tests/integration/`
+
+### Testing the Action Locally
+
+You can test the action using Docker:
+
+```bash
+# Build the Docker image
+docker build -t avm-action:local .github/actions/avm-action/
+
+# Run a test command
+docker run --rm \
+  -e INPUT_TF_DIRECTORY="." \
+  -e INPUT_COMMAND="validate" \
+  -e INPUT_LOG_LEVEL="DEBUG" \
+  -v $(pwd)/terraform/examples/basic-usage:/github/workspace \
+  -w /github/workspace \
+  avm-action:local
+```
 
 ### Commit Messages
 

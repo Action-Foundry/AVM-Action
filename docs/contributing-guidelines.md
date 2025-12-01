@@ -7,7 +7,8 @@ This document provides extended guidelines for contributing to the `avm-action` 
 ### Prerequisites
 
 - Python 3.11 or later
-- Terraform 1.3.0 or later
+- Docker (for testing the action locally)
+- Terraform 1.3.0 or later (optional, included in Docker image)
 - Git
 
 ### Setup
@@ -29,6 +30,11 @@ This document provides extended guidelines for contributing to the `avm-action` 
 3. Install development dependencies:
    ```bash
    pip install -r .github/actions/avm-action/requirements-dev.txt
+   ```
+
+4. Build the Docker image:
+   ```bash
+   docker build -t avm-action:local .github/actions/avm-action/
    ```
 
 ## Code Style
@@ -140,6 +146,25 @@ ruff check --fix .github/actions/avm-action/src/ tests/
 
 # Type checking
 mypy .github/actions/avm-action/src/
+```
+
+### Docker
+
+```bash
+# Build the Docker image
+docker build -t avm-action:local .github/actions/avm-action/
+
+# Test the Docker image runs
+docker run --rm --entrypoint terraform avm-action:local version
+
+# Test the action with a local Terraform configuration
+docker run --rm \
+  -e INPUT_TF_DIRECTORY="." \
+  -e INPUT_COMMAND="validate" \
+  -e INPUT_LOG_LEVEL="DEBUG" \
+  -v $(pwd)/terraform/examples/basic-usage:/github/workspace \
+  -w /github/workspace \
+  avm-action:local
 ```
 
 ### Terraform

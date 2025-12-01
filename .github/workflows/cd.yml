@@ -1,0 +1,87 @@
+name: CD
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .github/actions/avm-action/requirements-dev.txt
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+      - name: Check formatting
+        run: black --check .github/actions/avm-action/src/ tests/
+
+      - name: Lint
+        run: ruff check .github/actions/avm-action/src/ tests/
+
+  release:
+    name: Create Release
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## AVM Action ${{ steps.version.outputs.VERSION }}
+            
+            ### Usage
+            
+            ```yaml
+            - uses: Action-Foundry/AVM-Action/.github/actions/avm-action@${{ steps.version.outputs.VERSION }}
+              with:
+                command: plan
+                tf_directory: ./terraform
+            ```
+            
+            See [README](https://github.com/Action-Foundry/AVM-Action#readme) for full documentation.
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-major-tag:
+    name: Update Major Version Tag
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update major version tag
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -fa $MAJOR -m "Update $MAJOR tag"
+          git push origin $MAJOR --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

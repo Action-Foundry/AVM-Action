@@ -1,0 +1,44 @@
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/.github/actions/avm-action"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps(python)"
+    labels:
+      - "dependencies"
+      - "python"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps(actions)"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Terraform modules (if using registry modules)
+  - package-ecosystem: "terraform"
+    directory: "/terraform/modules/example_module"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps(terraform)"
+    labels:
+      - "dependencies"
+      - "terraform"
+
+  - package-ecosystem: "terraform"
+    directory: "/terraform/examples/basic-usage"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps(terraform)"
+    labels:
+      - "dependencies"
+      - "terraform"

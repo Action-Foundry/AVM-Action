@@ -1,0 +1,89 @@
+name: 'AVM Action'
+description: 'A Python-based GitHub Action for working with Terraform in Azure Verified Modules (AVM)-style environments'
+author: 'Action-Foundry'
+
+branding:
+  icon: 'cloud'
+  color: 'blue'
+
+inputs:
+  tf_directory:
+    description: 'Path to the Terraform configuration directory'
+    required: false
+    default: '.'
+  tfvars_files:
+    description: 'Comma-separated list of tfvars files or glob pattern'
+    required: false
+    default: ''
+  backend_config_file:
+    description: 'Path to the backend configuration file'
+    required: false
+    default: ''
+  command:
+    description: 'Terraform command to run (init, plan, apply, destroy, validate)'
+    required: true
+    default: 'plan'
+  workspace:
+    description: 'Terraform workspace to use'
+    required: false
+    default: 'default'
+  azure_subscription_id:
+    description: 'Azure Subscription ID'
+    required: false
+    default: ''
+  azure_tenant_id:
+    description: 'Azure Tenant ID'
+    required: false
+    default: ''
+  azure_client_id:
+    description: 'Azure Client ID (optional; prefer OIDC)'
+    required: false
+    default: ''
+  var_overrides:
+    description: 'JSON or key=value pairs for variable overrides'
+    required: false
+    default: ''
+  log_level:
+    description: 'Logging level (DEBUG, INFO, WARNING, ERROR)'
+    required: false
+    default: 'INFO'
+
+outputs:
+  plan_output:
+    description: 'Output from terraform plan command'
+    value: ${{ steps.run-action.outputs.plan_output }}
+  state_summary:
+    description: 'Summary of the Terraform state changes'
+    value: ${{ steps.run-action.outputs.state_summary }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ${{ github.action_path }}/requirements.txt
+
+    - name: Run AVM Action
+      id: run-action
+      shell: bash
+      env:
+        INPUT_TF_DIRECTORY: ${{ inputs.tf_directory }}
+        INPUT_TFVARS_FILES: ${{ inputs.tfvars_files }}
+        INPUT_BACKEND_CONFIG_FILE: ${{ inputs.backend_config_file }}
+        INPUT_COMMAND: ${{ inputs.command }}
+        INPUT_WORKSPACE: ${{ inputs.workspace }}
+        INPUT_AZURE_SUBSCRIPTION_ID: ${{ inputs.azure_subscription_id }}
+        INPUT_AZURE_TENANT_ID: ${{ inputs.azure_tenant_id }}
+        INPUT_AZURE_CLIENT_ID: ${{ inputs.azure_client_id }}
+        INPUT_VAR_OVERRIDES: ${{ inputs.var_overrides }}
+        INPUT_LOG_LEVEL: ${{ inputs.log_level }}
+      run: |
+        cd ${{ github.action_path }}
+        python -m src.main

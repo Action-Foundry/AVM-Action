@@ -47,6 +47,18 @@ inputs:
     description: 'Logging level (DEBUG, INFO, WARNING, ERROR)'
     required: false
     default: 'INFO'
+  avm_version:
+    description: 'Azure Verified Modules version to use (e.g., "0.1.0" or "latest")'
+    required: false
+    default: 'latest'
+  terraform_version:
+    description: 'Terraform version to use (e.g., "1.6.0" or "latest")'
+    required: false
+    default: 'latest'
+  azurerm_version:
+    description: 'Azure RM provider version to use (e.g., "3.85.0" or "latest")'
+    required: false
+    default: 'latest'
 
 outputs:
   plan_output:
@@ -84,6 +96,9 @@ runs:
         INPUT_AZURE_CLIENT_ID: ${{ inputs.azure_client_id }}
         INPUT_VAR_OVERRIDES: ${{ inputs.var_overrides }}
         INPUT_LOG_LEVEL: ${{ inputs.log_level }}
+        INPUT_AVM_VERSION: ${{ inputs.avm_version }}
+        INPUT_TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+        INPUT_AZURERM_VERSION: ${{ inputs.azurerm_version }}
       run: |
         cd ${{ github.action_path }}
         python -m src.main

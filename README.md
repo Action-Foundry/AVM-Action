@@ -95,6 +95,9 @@ jobs:
 | `azure_client_id` | Azure Client ID | No | `""` |
 | `var_overrides` | JSON or key=value variable overrides | No | `""` |
 | `log_level` | Logging level | No | `INFO` |
+| `avm_version` | Azure Verified Modules version | No | `latest` |
+| `terraform_version` | Terraform version | No | `latest` |
+| `azurerm_version` | Azure RM provider version | No | `latest` |
 
 ## Outputs
 

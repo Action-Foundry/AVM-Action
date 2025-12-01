@@ -68,6 +68,9 @@ class ActionConfig:
         azure: Azure authentication configuration.
         var_overrides: Dictionary of variable overrides.
         log_level: Logging level.
+        avm_version: Azure Verified Modules version.
+        terraform_version: Terraform version.
+        azurerm_version: Azure RM provider version.
     """
 
     tf_directory: str = "."
@@ -78,6 +81,9 @@ class ActionConfig:
     azure: AzureConfig = field(default_factory=AzureConfig)
     var_overrides: dict[str, str] = field(default_factory=dict)
     log_level: LogLevel = LogLevel.INFO
+    avm_version: str = "latest"
+    terraform_version: str = "latest"
+    azurerm_version: str = "latest"
 
     def validate(self) -> list[str]:
         """Validate the configuration.
@@ -221,6 +227,9 @@ def load_config_from_env() -> ActionConfig:
         azure=azure_config,
         var_overrides=_parse_var_overrides(get_input("var_overrides")),
         log_level=_parse_log_level(log_level_str),
+        avm_version=get_input("avm_version", "latest"),
+        terraform_version=get_input("terraform_version", "latest"),
+        azurerm_version=get_input("azurerm_version", "latest"),
     )
 
     return config

@@ -42,6 +42,9 @@ def main() -> int:
         )
         logger.debug(f"Workspace: {config.workspace}")
         logger.debug(f"tfvars files: {config.tfvars_files}")
+        logger.debug(f"AVM version: {config.avm_version}")
+        logger.debug(f"Terraform version: {config.terraform_version}")
+        logger.debug(f"AzureRM provider version: {config.azurerm_version}")
 
         # Create Terraform runner
         # TODO: Remove dry_run=True when ready for production execution

@@ -166,6 +166,20 @@ class TestActionConfig:
         assert config.workspace == "default"
         assert config.var_overrides == {}
         assert config.log_level == LogLevel.INFO
+        assert config.avm_version == "latest"
+        assert config.terraform_version == "latest"
+        assert config.azurerm_version == "latest"
+
+    def test_version_fields_can_be_set(self):
+        """Version fields should be configurable."""
+        config = ActionConfig(
+            avm_version="0.1.0",
+            terraform_version="1.6.0",
+            azurerm_version="3.85.0",
+        )
+        assert config.avm_version == "0.1.0"
+        assert config.terraform_version == "1.6.0"
+        assert config.azurerm_version == "3.85.0"
 
     def test_validate_valid_config(self):
         """Valid config should return no errors."""
@@ -220,3 +234,20 @@ class TestLoadConfigFromEnv:
         assert config.tf_directory == "."
         assert config.command == TerraformCommand.PLAN
         assert config.workspace == "default"
+        assert config.avm_version == "latest"
+        assert config.terraform_version == "latest"
+        assert config.azurerm_version == "latest"
+
+    def test_loads_version_fields_from_environment(self):
+        """Version fields should be loaded from INPUT_* environment variables."""
+        env = {
+            "INPUT_AVM_VERSION": "0.1.0",
+            "INPUT_TERRAFORM_VERSION": "1.6.0",
+            "INPUT_AZURERM_VERSION": "3.85.0",
+        }
+        with mock.patch.dict(os.environ, env, clear=False):
+            config = load_config_from_env()
+
+        assert config.avm_version == "0.1.0"
+        assert config.terraform_version == "1.6.0"
+        assert config.azurerm_version == "3.85.0"

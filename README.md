@@ -9,6 +9,7 @@ A Python-based GitHub Action for working with Terraform in **Azure Verified Modu
 
 `avm-action` provides a clean, opinionated interface for Terraform workflows, designed for enterprise use with Azure infrastructure. It supports:
 
+- **Docker-based Execution**: Self-contained environment with Terraform pre-installed
 - **Terraform Commands**: `init`, `validate`, `plan`, `apply`, `destroy`
 - **Multiple tfvars files**: Pass environment-specific configurations
 - **Workspace Management**: Automatic workspace selection and creation
@@ -32,9 +33,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
       - name: Terraform Plan
         uses: Action-Foundry/AVM-Action/.github/actions/avm-action@main
         with:
@@ -42,6 +40,8 @@ jobs:
           command: plan
           tfvars_files: terraform.tfvars
 ```
+
+> **Note**: The action includes Terraform in the Docker container, so you don't need to use `hashicorp/setup-terraform` separately.
 
 ### With Azure Authentication (OIDC)
 
@@ -61,9 +61,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
       - name: Azure Login
         uses: azure/login@v2
@@ -119,6 +116,12 @@ jobs:
 .
 ├── .github/
 │   ├── actions/avm-action/     # GitHub Action implementation
+│   │   ├── action.yml          # Action metadata
+│   │   ├── Dockerfile          # Docker image definition
+│   │   ├── entrypoint.sh       # Container entrypoint script
+│   │   ├── src/                # Python source code
+│   │   ├── requirements.txt    # Runtime dependencies
+│   │   └── requirements-dev.txt # Development dependencies
 │   └── workflows/              # CI/CD workflows
 ├── terraform/
 │   ├── modules/                # Reusable Terraform modules
@@ -132,7 +135,8 @@ jobs:
 ### Prerequisites
 
 - Python 3.11+
-- Terraform 1.3.0+
+- Docker (for local testing)
+- Terraform 1.3.0+ (optional, included in Docker image)
 
 ### Setup
 
@@ -146,6 +150,16 @@ pytest tests/ -v --cov
 # Run linting
 black --check .github/actions/avm-action/src/ tests/
 ruff check .github/actions/avm-action/src/ tests/
+```
+
+### Docker Build
+
+```bash
+# Build the action Docker image
+docker build -t avm-action:local .github/actions/avm-action/
+
+# Test the Docker image
+docker run --rm --entrypoint terraform avm-action:local version
 ```
 
 ### Terraform Validation

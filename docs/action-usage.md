@@ -2,6 +2,8 @@
 
 This guide explains how to use the `avm-action` GitHub Action in your workflows.
 
+> **Note**: The action uses a Docker container with Terraform pre-installed. You don't need to use `hashicorp/setup-terraform` separately.
+
 ## Basic Usage
 
 ### Minimal Configuration
@@ -57,9 +59,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
       - name: Terraform Validate
         uses: Action-Foundry/AVM-Action/.github/actions/avm-action@main
         with:
@@ -71,9 +70,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
       - name: Azure Login
         uses: azure/login@v2
@@ -99,9 +95,6 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
       - name: Azure Login
         uses: azure/login@v2
@@ -141,9 +134,6 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
       - name: Azure Login
         uses: azure/login@v2

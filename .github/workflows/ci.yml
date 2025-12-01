@@ -112,7 +112,10 @@ jobs:
         run: |
           docker build -t avm-action:test .github/actions/avm-action/
 
-      - name: Test Docker image
+      - name: Verify Terraform is installed
         run: |
-          docker run --rm avm-action:test --help || true
           docker run --rm --entrypoint terraform avm-action:test version
+
+      - name: Verify Python is installed
+        run: |
+          docker run --rm --entrypoint python3 avm-action:test --version

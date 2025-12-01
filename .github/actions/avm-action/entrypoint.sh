@@ -4,6 +4,9 @@
 
 set -e
 
+# Action directory (where Python code lives)
+ACTION_DIR="/action"
+
 # Function to log messages
 log() {
     echo "[AVM-Action] $1"
@@ -47,16 +50,6 @@ fi
 
 log "Terraform version: $(terraform version -json | python3 -c 'import sys,json; print(json.load(sys.stdin)["terraform_version"])')"
 
-# Change to the Terraform directory if specified
-if [ -n "${INPUT_TF_DIRECTORY}" ] && [ "${INPUT_TF_DIRECTORY}" != "." ]; then
-    if [ ! -d "${INPUT_TF_DIRECTORY}" ]; then
-        log "ERROR: Terraform directory not found: ${INPUT_TF_DIRECTORY}"
-        exit 1
-    fi
-    debug "Changing to directory: ${INPUT_TF_DIRECTORY}"
-    cd "${INPUT_TF_DIRECTORY}"
-fi
-
 # Set up Azure environment variables if provided
 if [ -n "${INPUT_AZURE_SUBSCRIPTION_ID}" ]; then
     export ARM_SUBSCRIPTION_ID="${INPUT_AZURE_SUBSCRIPTION_ID}"
@@ -73,8 +66,10 @@ if [ -n "${INPUT_AZURE_CLIENT_ID}" ]; then
     debug "Set ARM_CLIENT_ID"
 fi
 
-# Run the Python action
+# Run the Python action from the action directory
+# The Python code handles the tf_directory internally
 log "Running Python action module"
+cd "${ACTION_DIR}"
 python3 -m src.main
 exit_code=$?
 

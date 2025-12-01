@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-format:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .github/actions/avm-action/requirements-dev.txt
+
+      - name: Check formatting with black
+        run: black --check .github/actions/avm-action/src/ tests/
+
+      - name: Lint with ruff
+        run: ruff check .github/actions/avm-action/src/ tests/
+
+      - name: Type check with mypy
+        run: mypy .github/actions/avm-action/src/ --ignore-missing-imports
+        continue-on-error: true
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .github/actions/avm-action/requirements-dev.txt
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ -v --cov=.github/actions/avm-action/src --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  terraform-checks:
+    name: Terraform Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive terraform/
+
+      - name: Terraform Validate - Example Module
+        run: |
+          cd terraform/modules/example_module
+          terraform init -backend=false
+          terraform validate
+
+      - name: Terraform Validate - Basic Usage Example
+        run: |
+          cd terraform/examples/basic-usage
+          terraform init -backend=false
+          terraform validate
+
+  action-smoke-test:
+    name: Action Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Test Action (Dry Run)
+        uses: ./.github/actions/avm-action
+        with:
+          tf_directory: ./terraform/examples/basic-usage
+          command: validate
+          log_level: DEBUG
